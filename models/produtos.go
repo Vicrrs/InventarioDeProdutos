@@ -30,7 +30,7 @@ func BuscaTodosOsProdutos() []Produto {
 		var preco float64
 
 		// Preenche as variáveis com os dados de um produto, usando o método Scan.
-		err := selecDeTodosOsProdutos.Scan(&id, &nome, &descricao, &preco, &quantidade)
+		err := selecDeTodosOsProdutos.Scan(&id, &nome, &preco, &quantidade, &descricao)
 		if err != nil {
 			panic(err.Error()) // Em caso de erro ao escanear, encerra com um panic.
 		}
@@ -44,4 +44,15 @@ func BuscaTodosOsProdutos() []Produto {
 		produtos = append(produtos, p) // Adiciona o produto p à slice de produtos.
 	}
 	return produtos // Retorna a slice de produtos.
+}
+
+func CriaNovoProduto(nome, descricao string, preco float64, quantidade int) {
+	db := db.ConectaComBancoDeDados()
+
+	insereDadosNoBanco, err := db.Prepare("insert into produtos(nome, descricao, preco, quantidade) values($1, $2, $3, $4)")
+	if err != nil {
+		panic(err.Error())
+	}
+	insereDadosNoBanco.Exec(nome, descricao, preco, quantidade)
+	defer db.Close()
 }
